@@ -40,17 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   /* Shape */
-  brico.Shape = function(color1, color2, shape) {
+  brico.Shape = function(color1, color2, shape, shapeWidth, shapeHeight) {
     this.color1 = color1;
     this.color2 = color2;
-    this.def = new Array(25);
     this.rotation = 0;
     this.x = 0;
     this.y = 0;
-
-    for (var i = 0; i < 25; i++) {
-      this.def[i] = false;
-    }
+    this.width = shapeWidth;
+    this.height = shapeHeight;
+    this.def = new Array(shapeWidth * shapeHeight);
+    this.def.fill(false);
     for (var i = 0; i < shape.length; i++) {
       this.def[shape[i]] = true;
     }
@@ -76,26 +75,43 @@ document.addEventListener('DOMContentLoaded', function() {
   brico.Shape.prototype.draw = function(grid) {
     var color1 = this.color1.toString();
     var color2 = this.color2.toString();
-    var xs = grid.pixelWidth / grid.width;
-    var ys = grid.pixelHeight / grid.height;
-    var insetX = Math.floor(xs/6);
-    var insetY = Math.floor(ys/6);
+    var rlut = this.rotationLookupTable[this.rotation];
 
-    grid.ctx.strokeStyle = "rgba(60,60,60,1)";
-    grid.ctx.lineWidth = 2;
-
-    for (var i = 0; i < 25; i++) {
-      var j = this.rotationLookupTable[this.rotation][i];
+    grid.drawSquarePrepare();
+    for (var i = 0; i < this.def.length; i++) {
+      var j = rlut[i];
       if (this.def[j]) {
-        var x = (this.x + (i % 5)) * xs + grid.x;
-        var y = (this.y + Math.floor(i / 5)) * ys + grid.y;
-        grid.ctx.fillStyle = color1;
-        grid.ctx.fillRect(x, y, xs, ys);
-        grid.ctx.fillStyle = color2;
-        grid.ctx.fillRect(x+insetX, y+insetY, xs-2*insetX, ys-2*insetY);
-        grid.ctx.strokeRect(x, y, xs, ys);
+        var x = (this.x + (i % this.width));
+        var y = (this.y + Math.floor(i / this.width));
+        grid.drawSquare(x, y, color1, color2);
       }
     }
+  };
+
+  brico.Shape.prototype.getOccupiedSquares = function() {
+    return this.getOccupiedSquaresAfterMove(0, 0, undefined);
+  };
+
+  brico.Shape.prototype.getOccupiedSquaresAfterMove = function(dx, dy, rotation) {
+    var occupiedSquares = [];
+    var r = this.rotation;
+    if (rotation === true) {
+      r = (this.rotation + 90) % 360;
+    }
+    else if (rotation === false) {
+      r = (this.rotation + 270) % 360;
+    }
+
+    var rlut = this.rotationLookupTable[r];
+    for (var i = 0; i < this.def.length; i++) {
+      var j = rlut[i];
+      if (this.def[j]) {
+        var x = (this.x + dx + (i % this.width));
+        var y = (this.y + dy + Math.floor(i / this.width));
+        occupiedSquares.push([x, y]);
+      }
+    }
+    return occupiedSquares;
   };
 
   /* Shape factory */
@@ -125,11 +141,11 @@ document.addEventListener('DOMContentLoaded', function() {
   brico.ShapeFactory.newShape = function(shapeId) {
     var color1 = new brico.Color(shapeId, 0);
     var color2 = new brico.Color(shapeId, 3);
-    var shape = new brico.Shape(color1, color2, this.shapes[shapeId]);
+    var shape = new brico.Shape(color1, color2, this.shapes[shapeId], 5, 5);
     return shape;
   };
 
-  brico.Grid = function() {
+  brico.Grid = function(interval) {
     var canvas = document.getElementById('brico');
     this.ctx = canvas.getContext('2d');
 
@@ -140,11 +156,44 @@ document.addEventListener('DOMContentLoaded', function() {
     this.x = (canvas.width - this.pixelWidth) / 2;
     this.y = 0;
 
+    this.xs = this.pixelWidth / this.width;
+    this.ys = this.pixelHeight / this.height;
+    this.insetX = Math.floor(this.xs/6);
+    this.insetY = Math.floor(this.ys/6);
+
     this.currentShape = undefined;
+    this.gridData = new Array(this.width * this.height);
+
+    var self = this;
+    this.periodicTask = window.setInterval(function() {
+      self.tick();
+    }, interval);
   };
 
-  brico.Grid.prototype.setCurrentShape = function(s) {
-    this.currentShape = s;
+  brico.Grid.prototype.bake = function() {
+    if (this.currentShape) {
+      var occupiedSquares = this.currentShape.getOccupiedSquares();
+      for (var i = 0; i < occupiedSquares.length; i++) {
+        var j = occupiedSquares[i][1] * this.width + occupiedSquares[i][0];
+        this.gridData[j] = [this.currentShape.color1, this.currentShape.color2];
+      }
+      this.currentShape = undefined;
+    }
+  };
+
+  brico.Grid.prototype.drawSquarePrepare = function() {
+    grid.ctx.strokeStyle = "rgba(60,60,60,1)";
+    grid.ctx.lineWidth = 2;
+  };
+
+  brico.Grid.prototype.drawSquare = function(x, y, color1Str, color2Str) {
+    x = x * this.xs + this.x;
+    y = y * this.ys + this.y;
+    grid.ctx.fillStyle = color1Str;
+    grid.ctx.fillRect(x, y, this.xs, this.ys);
+    grid.ctx.fillStyle = color2Str;
+    grid.ctx.fillRect(x+this.insetX, y+this.insetY, this.xs-2*this.insetX, this.ys-2*this.insetY);
+    grid.ctx.strokeRect(x, y, this.xs, this.ys);
   };
 
   brico.Grid.prototype.draw = function() {
@@ -154,19 +203,41 @@ document.addEventListener('DOMContentLoaded', function() {
     grid.ctx.lineWidth = 2;
     grid.ctx.strokeRect(this.x, this.y, this.pixelWidth, this.pixelHeight);
 
+    this.drawSquarePrepare();
+    for (var i = 0; i < this.gridData.length; i++) {
+      if (this.gridData[i]) {
+        var x = i % this.width;
+        var y = Math.floor(i / this.width);
+        var c1 = this.gridData[i][0].toString();
+        var c2 = this.gridData[i][1].toString();
+        this.drawSquare(x, y, c1, c2);
+      }
+    }
+
     if (this.currentShape) {
       this.currentShape.draw(this);
     }
   };
 
-  brico.Grid.prototype.tryMove = function(dx, dy) {
-    if (this.currentShape) {
-      if (this.currentShape.y+5 < this.height) {
-        this.currentShape.move(dx, dy);
+  brico.Grid.prototype.detectCollision = function(shapeSquares) {
+    for (var i = 0; i < shapeSquares.length; i++) {
+      var j = shapeSquares[i][1] * this.width + shapeSquares[i][0];
+      if ((this.gridData[j] != undefined) ||
+          (shapeSquares[i][0] < 0) ||
+          (shapeSquares[i][0] >= this.width) ||
+          (shapeSquares[i][1] >= this.height)) {
         return true;
       }
-      else {
-        return false;
+    }
+    return false;
+  };
+
+  brico.Grid.prototype.tryMove = function(dx, dy) {
+    if (this.currentShape) {
+      var shapeSquares = this.currentShape.getOccupiedSquaresAfterMove(dx, dy, undefined);
+      if (!this.detectCollision(shapeSquares)) {
+        this.currentShape.move(dx, dy);
+        return true;
       }
     }
     return false;
@@ -174,12 +245,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   brico.Grid.prototype.tryRotate = function(clockwise) {
     if (this.currentShape) {
-      if (true) {
+      var shapeSquares = this.currentShape.getOccupiedSquaresAfterMove(0, 0, clockwise);
+      if (!this.detectCollision(shapeSquares)) {
         this.currentShape.rotate(clockwise);
         return true;
-      }
-      else {
-        return false;
       }
     }
     return false;
@@ -187,26 +256,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
   brico.Grid.prototype.drop = function() {
     if (this.currentShape) {
+      var dy = 1;
+      var shapeSquares = this.currentShape.getOccupiedSquaresAfterMove(0, dy, undefined);
+      while (!this.detectCollision(shapeSquares)) {
+        dy++;
+        for (var i = 0; i < shapeSquares.length; i++) {
+          shapeSquares[i][1]++;
+        }
+      }
+      if (dy > 1) {
+        this.currentShape.move(0, dy - 1);
+        return true;
+      }
     }
+    return false;
+  };
+
+  brico.Grid.prototype.removeFullLines = function() {
+    var fullLines = [];
+
+    for (var j = 0; j < this.height; j++) {
+      var isFull = true;
+      for (var i = 0; i < this.width; i++) {
+        if (!this.gridData[j * this.width + i]) {
+          isFull = false;
+          break;
+        }
+      }
+      if (isFull) {
+        fullLines.push(j);
+      }
+    }
+
+    for (var i = 0; i < fullLines.length; i++) {
+      var j = fullLines[i];
+      this.gridData.splice(j*this.width, this.width);
+    }
+    var newLines = new Array(fullLines.length * this.width);
+    this.gridData = newLines.concat(this.gridData);
+
+    return fullLines.length;
   };
 
   brico.Grid.prototype.tick = function() {
     if (!this.tryMove(0, 1)) {
       // merge shape into grid
+      this.bake();
       // delete lines
+      this.removeFullLines();
       // create new shape.
       var r = Math.random();
       var shapeId = Math.floor(r * brico.ShapeFactory.shapes.length);
-      var s = brico.ShapeFactory.newShape(shapeId);
-      this.setCurrentShape(s);
+      this.currentShape = brico.ShapeFactory.newShape(shapeId);
       if (!this.tryMove((this.width - 5)/2, 0)) {
         // game over
+        this.currentShape = undefined;
+        window.clearInterval(this.periodicTask);
       }
     }
     this.draw();
   };
 
-  var grid = new brico.Grid();
+  var grid = new brico.Grid(500);
 
   document.onkeypress = function(e) {
     e = e || window.event;
@@ -225,16 +336,19 @@ document.addEventListener('DOMContentLoaded', function() {
         grid.tryMove(1, 0);
         grid.draw();
         break;
+      case '8':
+        grid.tryRotate(true);
+        grid.draw();
+        break;
       case '0':
         grid.drop();
+        grid.draw();
+        break;
+      case '.':
+        grid.tryMove(0, 1);
         grid.draw();
         break;
       }
     }
   };
-
-  var task = setInterval(function() {
-    grid.tick();
-  }, 500);
-
 }, false);
