@@ -1,6 +1,125 @@
+html {
+  background: url(images/P4300313.JPG) no-repeat center center fixed;
+  background-size: cover;
+}
+
+body {
+  text-align: center;
+}
+
+h1 {
+  font-family: 'Slackey', cursive;
+  font-size: 48px;
+  text-shadow: #000 6px 6px 10px;
+  letter-spacing: 5px;
+}
+
+h1 span:nth-child(1) {
+  color: rgb(255, 232, 0);
+}
+h1 span:nth-child(2) {
+  color: rgb(98, 10, 215);
+}
+h1 span:nth-child(3) {
+  color: rgb(0, 215, 123);
+}
+h1 span:nth-child(4) {
+  color: rgb(0, 205, 205);
+}
+h1 span:nth-child(5) {
+  color: rgb(255, 116, 0);
+}
+h1 span:nth-child(6) {
+  color: rgb(208, 251, 0);
+}
+h1 span:nth-child(7) {
+  color: rgb(7, 122, 210);
+}
+
 canvas {
-  height: 480px;
-  width: 640px;
-  background-color: white;
-  border: 1px solid black;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+#brico-container {
+  text-align: left;
+  display: inline-block;
+  margin: 0 auto;
+  position: relative;
+}
+
+#brico-gameover {
+  display: none;
+  position: absolute;
+  top: 220px;
+  width: 260px;
+  text-align: center;
+  font-family: 'Slackey', cursive;
+  font-size: 48px;
+  line-height: 1;
+}
+
+#brico-board {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+#brico-panel {
+  font-family: 'Slackey', cursive;
+  font-size: 18px;
+  vertical-align: top;
+  display: inline-block;
+}
+
+#brico-preview,
+#brico-score-container,
+#brico-level-container {
+  display: block;
+}
+
+#brico-score-container {
+  margin-top: 20px;
+}
+
+.credits {
+  margin: 100px auto 0;
+  padding: 10px;
+  text-align: left;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  max-width: 800px;
+  font-family: 'Lato', sans-serif;
+  font-size: 11px;
+
+  letter-spacing: -0.31em;
+  text-rendering: optimizespeed;
+  word-spacing: -0.43em;
+}
+
+.credits a {
+  color: white;
+}
+
+.credits h2 {
+  margin-top: 0;
+  font-size: 14px;
+}
+
+.col-1, .col-2 {
+  zoom: 1;
+  letter-spacing: normal;
+  word-spacing: normal;
+  vertical-align: top;
+  text-rendering: auto;
+  display: inline-block;
+  width: 100%;
+}
+
+.col-2 {
+  width: 50%;
+}
+
+ul {
+  margin: 0;
+  padding: 0 20px;
 }

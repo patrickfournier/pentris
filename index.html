@@ -3,10 +3,52 @@
     <head>
         <title>Brico</title>
         <meta charset="utf-8" />
+        <link href='https://fonts.googleapis.com/css?family=Slackey' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" type="text/css" href="style.css">
         <script src="brico.js" type="text/javascript"></script>
     </head>
     <body>
-        <canvas id="brico" width="640" height="480">Your browser does not support the HTML canvas.</canvas>
+        <h1><span>P</span><span>e</span><span>n</span><span>t</span><span>r</span><span>i</span><span>s</span></h1>
+        <div id="brico-container">
+            <div id="brico-gameover">Game over</div>
+            <canvas id="brico-board" width="260" height="520">Your browser does not support the HTML canvas.</canvas>
+            <div id="brico-panel">
+                <canvas id="brico-preview" width="120" height="120">Your browser does not support the HTML canvas.</canvas>
+                <div id="brico-score-container">Score: <span id="brico-score">0</span></div>
+                <div id="brico-level-container">Level: <span id="brico-level">1</span></div>
+            </div>
+        </div>
+        <div class="credits">
+            <h2 class="col-1">Credits</h2>
+            <div class="col-2">
+                <p>Pentris, by <a target="_blank" href="http://www.patrickfournier.com">Patrick Fournier</a>. Code
+                    licensed under the <a target="_blank" href="http://www.apache.org/licenses/LICENSE-2.0.html">
+                    Apache License 2.0</a>.</p>
+                <p><span class="background-image-credit"></span></p>
+            </div>
+            <div class="col-2">
+                Additional resources:
+                <ul>
+                    <li><a target="_blank" href="http://soundbible.com/2122-40-Smith-Wesson.html">40 Smith Wesson Sound</a>
+                        by Mike Koenig used under
+                        <a target="_blank" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
+                    <li><a target="_blank" href="http://soundbible.com/474-Magic-Wand-Noise.html">Magic Wand Noise Sound</a>
+                        by Mike Koenig used under
+                        <a target="_blank" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
+                    <li><a target="_blank" href="http://soundbible.com/1830-Sad-Trombone.html">Sad Trombone Sound</a>
+                        by Joe Lamb used under
+                        <a target="_blank" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
+                    <li><a target="_blank" href="http://soundbible.com/2103-1-Person-Cheering.html">1 Person Cheering Sound</a>
+                        by Jett Rifkin used under
+                        <a target="_blank" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
+                    <li><a target="_blank" href="https://www.google.com/fonts/specimen/Slackey">Slackey Font</a>
+                        by <a target="_blank" href="https://profiles.google.com/sideshowfonts/about">Sideshow</a> used under
+                        <a target="_blank" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License 2.0</a>.</li>
+                    <li><a target="_blank" href="https://www.google.com/fonts/specimen/Lato">Lato Font</a>
+                        by <a target="_blank" href="https://plus.google.com/106163021290874968147/about">Łukasz Dziedzic</a> used under
+                        <a target="_blank" href="http://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web">SIL OFL 1.1</a>.</li>
+                </ul>
+            </div>
     </body>
 </html>
