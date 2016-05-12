@@ -3,12 +3,14 @@ document.addEventListener('DOMContentLoaded', function() {
   /* TODO:
 
    - how to play
-   - review key assignment
-   - share (twitter, FB, ...)
+   - share (twitter, FB, ...), donate?
    - high score
-   - dynamic background image
+   - dynamic background image (loaded from flicker; change at each level)
    - fix sounds
    - animate line removal
+   - make game faster at higher levels
+   - analytics
+   - new game button
    */
 
   var brico = brico || {};
@@ -178,6 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
     this.insetY = Math.floor(this.ys/6);
 
     this.lastGridUpdateId = grid.updateId - 1;
+
+    this.animate();
   };
 
   brico.GridView.prototype.drawSquarePrepare = function() {
@@ -263,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   /* Grid */
-  brico.Grid = function(width, height, interval) {
+  brico.Grid = function(width, height) {
     this.width = width;
     this.height = height;
 
@@ -273,11 +277,6 @@ document.addEventListener('DOMContentLoaded', function() {
     this.gridData = new Array(this.width * this.height);
 
     this.updateId = 0;
-
-    var self = this;
-    this.periodicTask = window.setInterval(function() {
-      self.tick();
-    }, interval);
   };
 
   brico.Grid.prototype.bake = function() {
@@ -403,9 +402,7 @@ document.addEventListener('DOMContentLoaded', function() {
       this.currentShape = this.nextShape;
       if (!this.tryMove((this.width - 5)/2, 0)) {
         // game over
-        this.nextShape = undefined;
         this.currentShape = undefined;
-        window.clearInterval(this.periodicTask);
 
         var event = document.createEvent('Event');
         event.initEvent('brico-gameover', true, true);
@@ -418,7 +415,10 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   /* Game */
-  brico.Game = function(grid) {
+  brico.Game = function(grid, interval) {
+    this.playing = false;
+    this.grid = grid;
+    this.interval = interval;
     this.score = 0;
     this.lineCompleted = 0;
     this.level = 1;
@@ -436,33 +436,63 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('brico-drop', brico.Game.prototype.dropEventListener.bind(this));
     document.addEventListener('brico-gameover', brico.Game.prototype.gameOverEventListener.bind(this));
 
+    var self = this;
     document.onkeypress = function(e) {
       e = e || window.event;
       var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
       if (charCode) {
-        switch (String.fromCharCode(charCode)) {
-        case 'j':
-          grid.tryMove(-1, 0);
-          break;
-        case 'k':
-        grid.tryRotate(false);
-          break;
-        case 'l':
-          grid.tryMove(1, 0);
-          break;
-        case 'i':
-          grid.tryRotate(true);
-          break;
-        case ' ':
-          grid.drop();
-          grid.bake();
-          break;
-      case 'h':
-          grid.tryMove(0, 1);
-          break;
+        if (String.fromCharCode(charCode) == 'p') {
+          self.togglePause();
+        }
+
+        if (self.playing) {
+          switch (String.fromCharCode(charCode)) {
+          case 'j':
+            grid.tryMove(-1, 0);
+            break;
+          case 'k':
+            grid.tryRotate(false);
+            break;
+          case 'l':
+            grid.tryMove(1, 0);
+            break;
+          case 'i':
+            grid.tryRotate(true);
+            break;
+          case ' ':
+            grid.drop();
+            grid.bake();
+            break;
+          case 'h':
+            grid.tryMove(0, 1);
+            break;
+          }
         }
       }
     };
+  };
+
+  brico.Game.prototype.start = function() {
+    var self = this;
+    this.playing = true;
+    this.grid.tick();
+    this.periodicTask = window.setInterval(function() {
+      self.grid.tick();
+    }, this.interval);
+  };
+
+  brico.Game.prototype.stop = function() {
+    window.clearInterval(this.periodicTask);
+    this.playing = false;
+  };
+
+  brico.Game.prototype.togglePause = function() {
+    if (this.playing) {
+      this.stop();
+    }
+    else {
+      this.start();
+    }
   };
 
   brico.Game.prototype.bakeEventListener = function(e) {
@@ -481,10 +511,6 @@ document.addEventListener('DOMContentLoaded', function() {
       this.fourLinesSound.play();
     }
 
-    this.score += 10 * e.lines;
-    if (e.lines == 4) {
-      this.score += 100;
-    }
     this.scoreElem.innerHTML = this.score;
     this.lineCompleted += e.lines;
     while (this.lineCompleted > 10) {
@@ -507,16 +533,17 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   brico.Game.prototype.gameOverEventListener = function(e) {
+    this.stop();
+
     this.gameOverSound.currentTime = 0;
     this.gameOverSound.play();
     document.getElementById('brico-gameover').style.display = "block";
   };
 
-  var grid = new brico.Grid(13, 26, 500);
+  var grid = new brico.Grid(13, 26);
   var gridView = new brico.GridView('brico-board', grid);
   var shapePreview = new brico.ShapePreviewView('brico-preview', grid);
-  var game = new brico.Game(grid);
+  var game = new brico.Game(grid, 500);
+  game.start();
 
-  gridView.animate();
-  shapePreview.animate();
 }, false);
