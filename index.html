@@ -3,12 +3,52 @@
     <head>
         <title>Pentris</title>
         <meta charset="utf-8" />
+        <meta name="description" content="Pentris is a game where you must align pentaminoes to form lines of blocks. Difficult but addictive!">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta property="og:title" content="Pentris" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://pentris.patrickfournier.com" />
+        <meta property="og:image" content="http://pentris.patrickfournier.com/images/pentris.png" />
+        <meta property="og:description" content="An addictive and difficult block game." />
+
+        <link rel="canonical" href="http://pentris.patrickfournier.com">
+        <link rel="icon" sizes="32x32" type="image/png" href="images/favicon.png">
+        <link rel="icon" sizes="62x62" type="image/png" href="images/pentris.png">
+        <link rel="apple-touch-icon" sizes="62x62" type="image/png" href="images/pentris.png">
+        <link rel="me" href="https://twitter.com/_patfournier_" >
         <link href='https://fonts.googleapis.com/css?family=Slackey' rel='stylesheet' type='text/css'>
         <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" type="text/css" href="style.css">
         <script src="brico.js" type="text/javascript"></script>
+
+        <script>window.twttr = (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0],
+                t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+
+            t._e = [];
+            t.ready = function(f) {
+                t._e.push(f);
+            };
+
+            return t;
+         }(document, "script", "twitter-wjs"));</script>
     </head>
     <body>
+        <div id="fb-root"></div>
+        <script>(function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "//connect.facebook.net/fr_CA/sdk.js#xfbml=1&version=v2.6&appId=233924820310818";
+            fjs.parentNode.insertBefore(js, fjs);
+         }(document, 'script', 'facebook-jssdk'));</script>
+
         <h1><span>P</span><span>e</span><span>n</span><span>t</span><span>r</span><span>i</span><span>s</span></h1>
         <div id="brico-container">
             <div id="brico-gameover">Game over</div>
@@ -32,12 +72,19 @@
                 </div>
             </div>
         </div>
+        <div class="social">
+            <a class="twitter-share-button"
+               href="https://twitter.com/intent/tweet?text=I%20played%20Pentris%20today.%20Check%20it%20out!&hashtags=pentris,game,funtimes"
+               data-size="large">
+                Tweet</a>
+            <div class="fb-share-button" data-href="http://pentris.patrickfournier.com" data-layout="button_count" data-mobile-iframe="true"></div>
+        </div>
         <div class="credits">
             <h2 class="col-1">Credits</h2>
             <div class="col-2">
-                <p>Pentris, by <a target="_blank" href="http://www.patrickfournier.com">Patrick Fournier</a>. This
-                    is a rewrite of the original Pentris game for the
-                    Mac. Code licensed under the <a target="_blank" href="http://www.apache.org/licenses/LICENSE-2.0.html">
+                <p>Pentris, &copy; 2016 <a target="_blank" href="http://www.patrickfournier.com">Patrick Fournier</a>. This
+                    is a rewrite of the Pentris game I wrote for the
+                    Mac in 1993. Code licensed under the <a target="_blank" href="http://www.apache.org/licenses/LICENSE-2.0.html">
                     Apache License 2.0</a>.</p>
                 <p><span class="brico-background-image-credit">
                     <a class="image-link" target="_blank" href="">Background image</a> by

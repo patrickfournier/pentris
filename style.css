@@ -86,7 +86,7 @@ canvas {
 
 #brico-instructions {
   margin-top: 20px;
-  width: 150px;
+  width: 155px;
   box-sizing: border-box;
   background-color: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(0, 0, 0, 0.4);
@@ -104,12 +104,16 @@ canvas {
 
 #brico-instructions .move {
   display: inline-block;
-  width: 85px;
+  width: 90px;
   vertical-align: top;
 }
 
+.social {
+  margin: 50px auto 0;
+}
+
 .credits {
-  margin: 100px auto 0;
+  margin: 50px auto 0;
   padding: 10px;
   text-align: left;
   background-color: rgba(0, 0, 0, 0.4);
@@ -151,4 +155,8 @@ canvas {
 ul {
   margin: 0;
   padding: 0 20px;
+}
+
+.twitter-share-button, .fb-share-button {
+  display: inline-block;
 }

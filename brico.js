@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
   /* TODO:
-
-   - share (twitter, FB, ...), donate?
    - animate line removal
    - new game button
    */
@@ -44,24 +42,29 @@ document.addEventListener('DOMContentLoaded', function() {
     return this.colorString;
   };
 
-  /* Shape */
-  brico.Shape = function(color1, color2, shape, shapeWidth, shapeHeight) {
+  /**
+   Shape
+
+   Shapes are defined by a 5x5 array of bools.
+   */
+  brico.Shape = function(color1, color2, shape) {
     this.color1 = color1;
     this.color2 = color2;
     this.rotation = 0;
     this.x = 0;
     this.y = 0;
-    this.width = shapeWidth;
-    this.height = shapeHeight;
-    this.def = new Array(shapeWidth * shapeHeight);
+    this.width = 5;
+    this.height = 5;
+    this.def = new Array(this.width * this.height);
     this.def.fill(false);
     for (var i = 0; i < shape.length; i++) {
       this.def[shape[i]] = true;
     }
 
-    var minX = shapeWidth;
+    // Compute bounding box.
+    var minX = this.width;
     var maxX = 0;
-    var minY = shapeHeight;
+    var minY = this.height;
     var maxY = 0;
     var squares = this.getOccupiedSquares();
     for (var i = 0; i < squares.length; i++) {
@@ -76,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     this.bboxHeight = maxY - minY + 1;
   };
 
+  // Index lookup table for rotated shapes. Rotations are clockwise.
   brico.Shape.prototype.rotationLookupTable = {
     0  : [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
     90 : [20, 15, 10, 5, 0, 21, 16, 11, 6, 1, 22, 17, 12, 7, 2, 23, 18, 13, 8, 3, 24, 19, 14, 9, 4],
@@ -94,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   brico.Shape.prototype.getOccupiedSquares = function() {
-    return this.getOccupiedSquaresAfterMove(0, 0, undefined);
+    return this.getOccupiedSquaresAfterMove(0, 0, null);
   };
 
   brico.Shape.prototype.getOccupiedSquaresAfterMove = function(dx, dy, clockwiseRotation) {
@@ -146,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
   brico.ShapeFactory.newShape = function(shapeId) {
     var color1 = new brico.Color(shapeId, 0);
     var color2 = new brico.Color(shapeId, 3);
-    var shape = new brico.Shape(color1, color2, this.shapes[shapeId], 5, 5);
+    var shape = new brico.Shape(color1, color2, this.shapes[shapeId]);
     return shape;
   };
 
