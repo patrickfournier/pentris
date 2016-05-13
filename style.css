@@ -159,4 +159,6 @@ ul {
 
 .twitter-share-button, .fb-share-button {
   display: inline-block;
+  vertical-align: middle;
+  margin: 0 10px;
 }

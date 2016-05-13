@@ -520,10 +520,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var highscore = window.localStorage.getItem('highscore') || 0;
     this.highScoreElem.innerHTML = highscore;
 
-    this.dropSound = [new Audio('sounds/drop.mp3'), new Audio('sounds/drop.mp3'), new Audio('sounds/drop.mp3')];
-    this.linesSound = new Audio('sounds/magic_wand.mp3');
-    this.fourLinesSound = new Audio('sounds/cheers.mp3');
-    this.gameOverSound = new Audio('sounds/sad_trombone.mp3');
+    this.dropSound = [new Audio('sounds/drop.ogg'), new Audio('sounds/drop.ogg'), new Audio('sounds/drop.ogg')];
+    this.linesSound = new Audio('sounds/magic_wand.ogg');
+    this.fourLinesSound = new Audio('sounds/cheers.ogg');
+    this.gameOverSound = new Audio('sounds/sad_trombone.ogg');
 
     document.addEventListener('brico-bake', brico.Game.prototype.bakeEventListener.bind(this));
     document.addEventListener('brico-lines', brico.Game.prototype.fullLinesEventListener.bind(this));
@@ -537,28 +537,35 @@ document.addEventListener('DOMContentLoaded', function() {
       if (charCode) {
         if (String.fromCharCode(charCode) == 'p') {
           self.togglePause();
+          e.preventDefault();
         }
 
         if (self.playing) {
           switch (String.fromCharCode(charCode)) {
           case 'j':
             grid.tryMove(-1, 0);
+            e.preventDefault();
             break;
           case 'k':
             grid.tryRotate(false);
+            e.preventDefault();
             break;
           case 'l':
             grid.tryMove(1, 0);
+            e.preventDefault();
             break;
           case 'i':
             grid.tryRotate(true);
+            e.preventDefault();
             break;
           case ' ':
             grid.drop();
             grid.bake();
+            e.preventDefault();
             break;
           case 'h':
             grid.tryMove(0, 1);
+            e.preventDefault();
             break;
           }
         }
