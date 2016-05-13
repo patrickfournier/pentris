@@ -17,6 +17,19 @@
                 <canvas id="brico-preview" width="120" height="120">Your browser does not support the HTML canvas.</canvas>
                 <div id="brico-score-container">Score: <span id="brico-score">0</span></div>
                 <div id="brico-level-container">Level: <span id="brico-level">1</span></div>
+                <div id="brico-highscore-container">High score: <span id="brico-highscore">0</span></div>
+                <div id="brico-instructions">
+                    <h2>How to play</h2>
+                    <p>
+                        <span class="key">j</span><span class="move">move left</span><br/>
+                        <span class="key">l</span><span class="move">move right</span><br/>
+                        <span class="key">h</span><span class="move">move down</span><br/>
+                        <span class="key">space</span><span class="move">drop</span><br/>
+                        <span class="key">k</span><span class="move">rotate counter-clockwise</span><br/>
+                        <span class="key">i</span><span class="move">rotate clockwise</span><br/>
+                        <span class="key">p</span><span class="move">pause/resume game</span><br/>
+                    </p>
+                </div>
             </div>
         </div>
         <div class="credits">
@@ -26,12 +39,14 @@
                     is a rewrite of the original Pentris game for the
                     Mac. Code licensed under the <a target="_blank" href="http://www.apache.org/licenses/LICENSE-2.0.html">
                     Apache License 2.0</a>.</p>
-                <p><span class="background-image-credit"></span></p>
+                <p><span class="brico-background-image-credit">
+                    <a class="image-link" target="_blank" href="">Background image</a> by
+                    <a class="author-link" target="_blank" href=""></a></span></p>
             </div>
             <div class="col-2">
                 <p>Additional resources:
                     <ul>
-                        <li><a target="_blank" href="http://soundbible.com/2122-40-Smith-Wesson.html">40 Smith Wesson Sound</a>
+                        <li>Drop sound derived from <a target="_blank" href="http://soundbible.com/2122-40-Smith-Wesson.html">40 Smith Wesson Sound</a>
                             by Mike Koenig used under
                             <a target="_blank" href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</li>
                         <li><a target="_blank" href="http://soundbible.com/474-Magic-Wand-Noise.html">Magic Wand Noise Sound</a>
@@ -51,5 +66,16 @@
                             <a target="_blank" href="http://scripts.sil.org/cms/scripts/page.php?item_id=OFL_web">SIL OFL 1.1</a>.</li>
                     </ul></p>
             </div>
+
+            <script>
+             (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                                      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+             })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+             ga('create', 'UA-56280561-2', 'auto');
+             ga('send', 'pageview');
+
+            </script>
     </body>
 </html>

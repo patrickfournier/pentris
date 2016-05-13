@@ -2,14 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   /* TODO:
 
-   - how to play
    - share (twitter, FB, ...), donate?
-   - high score
-   - dynamic background image (loaded from flicker; change at each level)
-   - fix sounds
    - animate line removal
-   - make game faster at higher levels
-   - analytics
    - new game button
    */
 
@@ -414,6 +408,97 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
+  brico.Background = function() {
+    this.backgrounds = [
+      {photo_url: "https://farm4.staticflickr.com/3842/15088487045_94b6a4fc31_k_d.jpg",
+       flickr_url: "https://flic.kr/p/oZjrwn",
+       author: "Normand Gaudreault",
+       author_url: "https://www.flickr.com/photos/95930823@N08/"},
+      {photo_url: "https://farm6.staticflickr.com/5134/5515913152_2f50ab52b0_o_d.jpg",
+       flickr_url: "https://flic.kr/p/9pquNU",
+       author: "Nick Kenrick",
+       author_url: "https://www.flickr.com/photos/zedzap/"},
+      {photo_url: "https://farm8.staticflickr.com/7608/16617366738_6a9222745f_o_d.jpg",
+       flickr_url: "https://flic.kr/p/rjqmc5",
+       author: "Guiseppe Milo",
+       author_url: "https://www.flickr.com/photos/giuseppemilo/"},
+      {photo_url: "https://farm9.staticflickr.com/8524/8478269827_08fcb6bc75_k_d.jpg",
+       flickr_url: "https://flic.kr/p/dVcmeZ",
+       author: "Stephan Oppermann",
+       author_url: "https://www.flickr.com/photos/s_oppermann/"},
+      {photo_url: "https://farm6.staticflickr.com/5526/11277422085_27afdde687_k_d.jpg",
+       flickr_url: "https://flic.kr/p/ibxJFP",
+       author: "Arnaud Fougerouse",
+       author_url: "https://www.flickr.com/photos/hihaa/"},
+      {photo_url: "https://farm6.staticflickr.com/5487/14141331128_78dd600bac_k_d.jpg",
+       flickr_url: "https://flic.kr/p/nxC24W",
+       author: "Christian",
+       author_url: "https://www.flickr.com/photos/blavandmaster/"},
+      {photo_url: "https://farm8.staticflickr.com/7695/17056169627_3ab896d24e_o_d.jpg",
+       flickr_url: "https://flic.kr/p/rZck18",
+       author: "Guiseppe Milo",
+       author_url: "https://www.flickr.com/photos/giuseppemilo/"},
+      {photo_url: "https://farm8.staticflickr.com/7392/16458204126_b9455a9dce_k_d.jpg",
+       flickr_url: "https://flic.kr/p/r5mAG7",
+       author: "Mibby23",
+       author_url: "https://www.flickr.com/photos/mibby23/"},
+      {photo_url: "https://farm9.staticflickr.com/8122/8609523972_a5de909ffa_o_d.jpg",
+       flickr_url: "https://flic.kr/p/e7N4wu",
+       author: "Christian",
+       author_url: "https://www.flickr.com/photos/blavandmaster/"},
+      {photo_url: "https://farm8.staticflickr.com/7609/16781847658_c919709c38_k_d.jpg",
+       flickr_url: "https://flic.kr/p/ryXmD1",
+       author: "Guven Gul",
+       author_url: "https://www.flickr.com/photos/guvengul/"},
+    ];
+    this.initBackground();
+
+    document.addEventListener('brico-nextlevel', brico.Background.prototype.changeBackground.bind(this));
+  };
+
+  brico.Background.prototype.initBackground = function() {
+    // Load first image and wait until it is loaded before setting the background.
+    var image = new Image();
+    image.src = this.backgrounds[0].photo_url;
+
+    var bg = document.getElementsByTagName('html')[0];
+    var credit = document.getElementsByClassName('brico-background-image-credit')[0];
+    var il = credit.getElementsByClassName('image-link')[0];
+    var al = credit.getElementsByClassName('author-link')[0];
+    var self = this;
+    image.addEventListener('load', function() {
+      bg.style.backgroundImage = 'url(' + self.backgrounds[0].photo_url + ')';
+      il.setAttribute('href', self.backgrounds[0].flickr_url);
+      al.setAttribute('href', self.backgrounds[0].author_url);
+      al.innerHTML = self.backgrounds[0].author;
+    });
+
+    // Preload next image. We keep it in this.nextImage to prevent the
+    // object from being garbage collected.
+    this.nextImage = new Image();
+    this.nextImage.src = this.backgrounds[1].photo_url;
+  };
+
+  brico.Background.prototype.changeBackground = function(e) {
+    var bgindex = (e.level - 1) % this.backgrounds.length;
+
+    var bg = document.getElementsByTagName('html')[0];
+    bg.style.backgroundImage = 'url(' + this.backgrounds[bgindex].photo_url + ')';
+
+    var credit = document.getElementsByClassName('brico-background-image-credit')[0];
+    var il = credit.getElementsByClassName('image-link')[0];
+    var al = credit.getElementsByClassName('author-link')[0];
+
+    il.setAttribute('href', this.backgrounds[bgindex].flickr_url);
+    al.setAttribute('href', this.backgrounds[bgindex].author_url);
+    al.innerHTML = this.backgrounds[bgindex].author;
+
+    // Preload next image
+    bgindex = (bgindex + 1) % this.backgrounds.length;
+    this.nextImage = new Image();
+    this.nextImage.src = this.backgrounds[bgindex].photo_url;
+  };
+
   /* Game */
   brico.Game = function(grid, interval) {
     this.playing = false;
@@ -422,9 +507,14 @@ document.addEventListener('DOMContentLoaded', function() {
     this.score = 0;
     this.lineCompleted = 0;
     this.level = 1;
+    this.linesPerLevel = 10;
 
     this.scoreElem = document.getElementById('brico-score');
     this.levelElem = document.getElementById('brico-level');
+    this.highScoreElem = document.getElementById('brico-highscore');
+
+    var highscore = window.localStorage.getItem('highscore') || 0;
+    this.highScoreElem.innerHTML = highscore;
 
     this.dropSound = [new Audio('sounds/drop.mp3'), new Audio('sounds/drop.mp3'), new Audio('sounds/drop.mp3')];
     this.linesSound = new Audio('sounds/magic_wand.mp3');
@@ -505,18 +595,30 @@ document.addEventListener('DOMContentLoaded', function() {
     this.linesSound.play();
 
     this.score += 10 * e.lines;
-    if (e.lines == 4) {
-      this.score += 100;
+    if (e.lines >= 4) {
+      this.score += (e.lines - 3) * 100;
       this.fourLinesSound.currentTime = 0;
       this.fourLinesSound.play();
     }
 
     this.scoreElem.innerHTML = this.score;
+
     this.lineCompleted += e.lines;
-    while (this.lineCompleted > 10) {
+    var currentInterval = this.interval;
+    while (this.lineCompleted >= this.linesPerLevel) {
+      this.lineCompleted -= this.linesPerLevel;
       this.level++;
+      this.interval *= 0.9;
       this.levelElem.innerHTML = this.level;
-      this.lineCompleted -= 10;
+
+      var event = document.createEvent('Event');
+      event.level = this.level;
+      event.initEvent('brico-nextlevel', true, true);
+      document.dispatchEvent(event);
+    }
+    if (currentInterval != this.interval) {
+      this.stop();
+      this.start();
     }
   };
 
@@ -530,10 +632,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     this.dropSound[i].currentTime = 0;
     this.dropSound[i].play();
+
+    this.score += 2 * e.dy;
   };
 
   brico.Game.prototype.gameOverEventListener = function(e) {
     this.stop();
+
+    var highscore = window.localStorage.getItem('highscore');
+    if (this.score > highscore) {
+      window.localStorage.setItem("highscore", this.score);
+      this.highScoreElem.innerHTML = this.score;
+    }
 
     this.gameOverSound.currentTime = 0;
     this.gameOverSound.play();
@@ -543,6 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var grid = new brico.Grid(13, 26);
   var gridView = new brico.GridView('brico-board', grid);
   var shapePreview = new brico.ShapePreviewView('brico-preview', grid);
+  var backgroundView = new brico.Background();
   var game = new brico.Game(grid, 500);
   game.start();
 
